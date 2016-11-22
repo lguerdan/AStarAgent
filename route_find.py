@@ -11,9 +11,6 @@ class SquareGraph:
       self.size = size
       self.weight = {}
 
-   # def neighbors(self, id):
-   #      return self.edges[id]
-
    def in_graph(self, position):
       (x, y) = position
       return 1 <= x <= self.size and 1 <= y <= self.size
@@ -56,17 +53,23 @@ def print_adj_graph(graph):
          print str(i) + str(j) + ":  " + str(graph.get_neighbors((i, j)))
 
 # Helper function to show visual state of graph
-def print_visual_graph(graph, agent, obstacle1=(-1,-1), obstacle2=(-1,-1)):
+def print_visual_graph_with_path(graph, agent, obstacle1=(-1,-1), obstacle2=(-1,-1)):
    for i in range(1, graph.size + 1):
       row_out = ""
       for j in range(1, graph.size + 1):
+
          if ((i, j) == agent):
+            row_out += " O "
+            agent_path_locations.append((i,j))
+
+         elif((i,j) in agent_path_locations):
             row_out += " O "
          elif ((i, j) == obstacle1 or (i, j) == obstacle2):
             row_out += " X "
          else:
             row_out += " - "
       print row_out
+
 
 class Queue:
     def __init__(self):
@@ -120,18 +123,16 @@ from the start until we hit none (the source/finish vertex). Not really optimal 
 
 def nieve_path_forward(graph, start, finish):
    came_from = breadth_first_search_modified(graph, finish)
-
    #Lets try swapping came from to go_to by exchanging keys and values
    # go_to = dict((v,k) for k,v in came_from.iteritems())
 
    agent_position = start
    while agent_position != None:
       print agent_position
-      print_visual_graph(graph, agent_position)
+      print_visual_graph_with_path(graph, agent_position)
       agent_position = came_from[agent_position]
 
-
-
+   print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
 
 def a_star_search(graph, start, goal):
     frontier = PriorityQueue()
@@ -158,23 +159,33 @@ def a_star_search(graph, start, goal):
     return came_from
 
 
-graph = SquareGraph(9)
+graph = SquareGraph(30)
+agent_path_locations = []
+
 start = (1,1)
 end = (8,9)
 nieve_path_forward(graph, start, end)
+
 print "#############################"
 
 
-# def informed_path_forward(graph, start, finish):
-#    came_from = a_star_search(graph, start, finish)
+def informed_path_forward(graph, start, finish):
+   agent_path_locations = []
+   came_from = a_star_search(graph, finish, start)
+   agent_position = start
 
-#    agent_position = start
-#    while agent_position != None:
-#       print agent_position
-#       print_visual_graph(graph, agent_position)
-#       agent_position = came_from[agent_position]
+   while agent_position != finish:
+      print agent_position
+      print_visual_graph_with_path(graph, agent_position)
+      agent_position = came_from[agent_position]
+   print agent_position
+   print_visual_graph_with_path(graph, agent_position)
 
-# graph = SquareGraph(9)
-# start = (1,1)
-# end = (8,9)
-# informed_path_forward(graph, start, end)
+   print "Total number nodes visited in optimized implementation: %d" % (len(came_from))
+   return came_from
+
+graph = SquareGraph(30)
+start = (1,1)
+end = (8,9)
+agent_path_locations = []
+came_from = informed_path_forward(graph, start, end)
