@@ -1,191 +1,54 @@
-import collections
-
-# Not currently being used. Could store additional state in future if neccessary
-class GridNode:
-   def __init__(self, x, y):
-      self.x = x
-      self.y = y
-
-class SquareGraph:
-   def __init__(self, size):
-      self.size = size
-      self.weight = {}
-
-   def in_graph(self, position):
-      (x, y) = position
-      return 1 <= x <= self.size and 1 <= y <= self.size
-
-   def get_neighbors(self, position):
-      (x, y) = position
-      neighbors = [(x + 1, y), (x - 1, y), (x, y+ 1), (x, y - 1), (x - 1, y - 1), (x + 1, y + 1), (x-1, y + 1), (x + 1, y - 1)]
-      neighbors = filter(self.in_graph, neighbors)
-      return neighbors
-
-   def get_cost(self, to_node, from_node):
-      return 1
-
-def heuristic(a, b):
-    (x1, y1) = a
-    (x2, y2) = b
-    return abs(x1 - x2) + abs(y1 - y2)
+from obstacle_avoidance import *
 
 
-# We could probably just store obstical state here. Maybe add a .move() method to calculate next position each time interval
-class Obstical(SquareGraph): # inherits from square graph so we can use in_graph method
-   def __init__(self, location, velocity, graph):
-      self.location = location
-      self.velocity = velocity
-      #also state for t + 1 location here
-
-   def move(self):
-      '''
-      # obstical logic here.
-      1) Check graph size and boundaries (using in_graph method)
-      2) next position based on current velocity
-      3) We will also need to store state of t + 1 position to Check for collisions
-      '''
-
-# Helper function to show adjacency list of graph
-def print_adj_graph(graph):
-   for i in range(1, graph.size + 1):
-      for j in range(1, graph.size + 1):
-
-         print str(i) + str(j) + ":  " + str(graph.get_neighbors((i, j)))
-
-# Helper function to show visual state of graph
-def print_visual_graph_with_path(graph, agent, obstacle1=(-1,-1), obstacle2=(-1,-1)):
-   for i in range(1, graph.size + 1):
-      row_out = ""
-      for j in range(1, graph.size + 1):
-
-         if ((i, j) == agent):
-            row_out += " O "
-            agent_path_locations.append((i,j))
-
-         elif((i,j) in agent_path_locations):
-            row_out += " O "
-         elif ((i, j) == obstacle1 or (i, j) == obstacle2):
-            row_out += " X "
-         else:
-            row_out += " - "
-      print row_out
+# graph = SquareGraph(30)
+# start = (1,1)
+# end = (8,9)
+# agent_path_locations = []
+# nieve_path_forward(graph, start, end)
 
 
-class Queue:
-    def __init__(self):
-        self.elements = collections.deque()
+# graph = SquareGraph(30)
+# start = (1,1)
+# end = (8,9)
+# agent_path_locations = []
+# came_from = informed_path_forward(graph, start, end)
 
-    def empty(self):
-        return len(self.elements) == 0
+# Wrapper class for entire program. Has access to two obsticles, agent, and room functions
+class ObsticleAvoidanceScenario:
+   def __init__(self, input_file):
+      self.load_initial_state(input_file)
 
-    def set(self, x):
-        self.elements.append(x)
+   def load_initial_state(self, input_file):
+      with open(input_file) as f:
+         in_file = [line.rstrip('\n') for line in open(input_file)]
 
-    def next(self):
-        return self.elements.popleft()
+      # Agent
+      self.roomsize = int(in_file[0])
+      self.agent_sl = self.instring_to_tuple(in_file[1])
+      self.agent_fl= self.instring_to_tuple(in_file[2])
 
-import heapq
-class PriorityQueue:
-    def __init__(self):
-        self.elements = []
+      # Obsticle 1
+      obsticle1_sl = self.instring_to_tuple(in_file[3])
+      obsticle1_speed = int(in_file[4])
+      obsticle1_velocity = self.instring_to_tuple(in_file[5])
+      self.obsticle1 = Obstical(obsticle1_sl, obsticle1_speed, obsticle1_velocity, self.roomsize)
 
-    def isempty(self):
-      if (len(self.elements) == 0):
-         return 0
-
-    def put(self, item, priority):
-        heapq.heappush(self.elements, (priority, item))
-
-    def get(self):
-        return heapq.heappop(self.elements)[1]
-
-
-def breadth_first_search_modified(graph, start):
-    # return "came_from"
-    boundary = Queue()
-    boundary.set(start)
-    came_from = {}
-    came_from[start] = None
-
-    while not boundary.empty():
-        current = boundary.next()
-        for next in graph.get_neighbors(current):
-            if next not in came_from:
-                boundary.set(next)
-                came_from[next] = current
-
-    return came_from
+      # Obsticle 2
+      obsticle2_sl = self.instring_to_tuple(in_file[6])
+      obsticle2_speed = int(in_file[7])
+      obsticle2_velocity = self.instring_to_tuple(in_file[8])
+      self.obsticle2 = Obstical(obsticle2_sl, obsticle2_speed, obsticle2_velocity, self.roomsize)
 
 
-'''Here is a demo traversal technique using only bfs with the came_from attribute.
-We run BFS from the finish vertex and follow the came_from
-from the start until we hit none (the source/finish vertex). Not really optimal though because BFS will visit all nodes first'''
-
-def nieve_path_forward(graph, start, finish):
-   came_from = breadth_first_search_modified(graph, finish)
-   #Lets try swapping came from to go_to by exchanging keys and values
-   # go_to = dict((v,k) for k,v in came_from.iteritems())
-
-   agent_position = start
-   while agent_position != None:
-      print agent_position
-      print_visual_graph_with_path(graph, agent_position)
-      agent_position = came_from[agent_position]
-
-   print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
-
-def a_star_search(graph, start, goal):
-    frontier = PriorityQueue()
-    frontier.put(start, 0)
-    came_from = {}
-    cost_so_far = {}
-    came_from[start] = None
-    cost_so_far[start] = 0
-
-    while not frontier.isempty():
-        current = frontier.get()
-
-        if current == goal:
-            break
-
-        for next in graph.get_neighbors(current):
-            new_cost = cost_so_far[current] + graph.get_cost(next, current)
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(goal, next)
-                frontier.put(next, priority)
-                came_from[next] = current
-
-    return came_from
+   def instring_to_tuple(self,instring):
+      striped = map(int, instring.split('(')[1].split(')')[0].split(','))
+      return striped[0], striped[1]
 
 
-graph = SquareGraph(30)
-agent_path_locations = []
-
-start = (1,1)
-end = (8,9)
-nieve_path_forward(graph, start, end)
-
-print "#############################"
-
-
-def informed_path_forward(graph, start, finish):
-   agent_path_locations = []
-   came_from = a_star_search(graph, finish, start)
-   agent_position = start
-
-   while agent_position != finish:
-      print agent_position
-      print_visual_graph_with_path(graph, agent_position)
-      agent_position = came_from[agent_position]
-   print agent_position
-   print_visual_graph_with_path(graph, agent_position)
-
-   print "Total number nodes visited in optimized implementation: %d" % (len(came_from))
-   return came_from
-
-graph = SquareGraph(30)
-start = (1,1)
-end = (8,9)
-agent_path_locations = []
-came_from = informed_path_forward(graph, start, end)
+# initializeing a scenario and accessing it's attributes
+scenario = ObsticleAvoidanceAgent('room.txt')
+print scenario.agent_sl
+print scenario.agent_fl
+print scenario.obsticle1.location
+print scenario.obsticle2.velocity
