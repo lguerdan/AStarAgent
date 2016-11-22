@@ -45,6 +45,14 @@ class SquareGraph:
    def get_cost(self, to_node, from_node):
       return 1
 
+   # Helper function to show adjacency list of graph
+   def print_adj_graph(self, graph):
+      for i in range(1, graph.size + 1):
+         for j in range(1, graph.size + 1):
+
+            print str(i) + str(j) + ":  " + str(graph.get_neighbors((i, j)))
+
+
 class Obstical(SquareGraph): # inherits from square graph so we can use in_graph method
    def __init__(self, location, speed, velocity, size):
       self.location = location
@@ -61,30 +69,6 @@ class Obstical(SquareGraph): # inherits from square graph so we can use in_graph
       3) We will also need to store state of t + 1 position to Check for collisions
       '''
 
-# Helper function to show adjacency list of graph
-def print_adj_graph(graph):
-   for i in range(1, graph.size + 1):
-      for j in range(1, graph.size + 1):
-
-         print str(i) + str(j) + ":  " + str(graph.get_neighbors((i, j)))
-
-# Helper function to show visual state of graph
-def print_visual_graph_with_path(graph, agent, obstacle1=(-1,-1), obstacle2=(-1,-1)):
-   for i in range(1, graph.size + 1):
-      row_out = ""
-      for j in range(1, graph.size + 1):
-
-         if ((i, j) == agent):
-            row_out += " O "
-            agent_path_locations.append((i,j))
-
-         elif((i,j) in agent_path_locations):
-            row_out += " O "
-         elif ((i, j) == obstacle1 or (i, j) == obstacle2):
-            row_out += " X "
-         else:
-            row_out += " - "
-      print row_out
 
 # distance-based cost function for dijkstras
 def heuristic(a, b):
@@ -124,7 +108,7 @@ def nieve_path_forward(graph, start, finish):
 
    print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
 
-agent_path_locations = []
+
 def a_star_search(graph, start, goal):
    frontier = PriorityQueue()
    frontier.put(start, 0)
@@ -148,18 +132,3 @@ def a_star_search(graph, start, goal):
 
    return came_from
 
-agent_path_locations = []
-def informed_path_forward(graph, start, finish):
-   agent_path_locations = []
-   came_from = a_star_search(graph, finish, start)
-   agent_position = start
-
-   while agent_position != finish:
-      print agent_position
-      print_visual_graph_with_path(graph, agent_position)
-      agent_position = came_from[agent_position]
-   print agent_position
-   print_visual_graph_with_path(graph, agent_position)
-
-   print "Total number nodes visited in optimized implementation: %d" % (len(came_from))
-   return came_from
