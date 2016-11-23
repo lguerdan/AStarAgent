@@ -43,7 +43,10 @@ class SquareGraph:
       return neighbors
 
    def get_cost(self, to_node, from_node):
-      return 1
+      if (to_node in self.weight):
+         return self.weight[to_node]
+      else:
+         return 1
 
    # Helper function to show adjacency list of graph
    def print_adj_graph(self, graph):

@@ -44,7 +44,11 @@ class ObsticleAvoidanceScenario:
       self.obsticle2 = Obstical(obsticle2_sl, obsticle2_speed, obsticle2_velocity, self.roomsize)
 
    def pathfind_optimized(self):
+      self.room.weight[self.obsticle1.location] = 1000
+      self.room.weight[self.obsticle2.location] = 1000
+
       came_from = a_star_search(self.room, self.agent_fl, self.agent_sl)
+
 
       while self.agent_location != self.agent_fl:
          self.print_graph_with_path()
@@ -57,6 +61,7 @@ class ObsticleAvoidanceScenario:
       return came_from
 
    def pathfind_nieve(self):
+
       came_from = breadth_first_search_modified(self.room, self.agent_fl)
 
       while self.agent_location != None:
@@ -90,12 +95,11 @@ class ObsticleAvoidanceScenario:
                row_out += " - "
          print row_out
 
-
 # initializeing a scenario and accessing it's attributes
 scenario = ObsticleAvoidanceScenario('room.txt')
 print scenario.agent_sl
 print scenario.agent_fl
 print scenario.obsticle1.location
 print scenario.obsticle2.velocity
-# scenario.pathfind_optimized()
-scenario.pathfind_nieve()
+scenario.pathfind_optimized()
+
