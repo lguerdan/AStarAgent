@@ -57,14 +57,24 @@ class SquareGraph:
 
 
 class Obstical(SquareGraph): # inherits from square graph so we can use in_graph method
-   def __init__(self, location, speed, velocity, size):
+   def __init__(self, location, speed, velocity, graph):
       self.location = location
+      self.location_next = self.move()
+      self.graph = graph
       self.speed = speed
       self.velocity = velocity
-      self.roomsize = size
+      self.roomsize = graph.size
       #also state for t + 1 location here
 
    def move(self):
+      x, y = self.location
+      velocity_x, velocity_y = self.velocity
+      speed_x, speed_y = self.speed
+      pos_x = (velocity_x * speed_x) + x
+      pos_y = (velocity_y * speed_y) + y
+      print pos_x, pos_y
+
+
       '''
       # obstical logic here.
       1) Check graph size and boundaries (using in_graph method)

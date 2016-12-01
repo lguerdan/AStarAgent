@@ -18,7 +18,6 @@ from obstacle_avoidance import *
 class ObsticleAvoidanceScenario:
    def __init__(self, input_file):
       self.load_initial_state(input_file)
-      self.room = SquareGraph(self.roomsize)
       self.agent_path = []
 
    def load_initial_state(self, input_file):
@@ -27,6 +26,8 @@ class ObsticleAvoidanceScenario:
 
       # Agent
       self.roomsize = int(in_file[0])
+      self.room = SquareGraph(self.roomsize)
+
       self.agent_sl = self.instring_to_tuple(in_file[1])
       self.agent_fl= self.instring_to_tuple(in_file[2])
       self.agent_location = self.agent_sl
@@ -35,13 +36,13 @@ class ObsticleAvoidanceScenario:
       obsticle1_sl = self.instring_to_tuple(in_file[3])
       obsticle1_speed = int(in_file[4])
       obsticle1_velocity = self.instring_to_tuple(in_file[5])
-      self.obsticle1 = Obstical(obsticle1_sl, obsticle1_speed, obsticle1_velocity, self.roomsize)
+      self.obsticle1 = Obstical(obsticle1_sl, obsticle1_speed, obsticle1_velocity, self.room)
 
       # Obsticle 2
       obsticle2_sl = self.instring_to_tuple(in_file[6])
       obsticle2_speed = int(in_file[7])
       obsticle2_velocity = self.instring_to_tuple(in_file[8])
-      self.obsticle2 = Obstical(obsticle2_sl, obsticle2_speed, obsticle2_velocity, self.roomsize)
+      self.obsticle2 = Obstical(obsticle2_sl, obsticle2_speed, obsticle2_velocity, self.room)
 
    def pathfind_optimized(self):
       self.room.weight[self.obsticle1.location] = 1000
@@ -61,7 +62,6 @@ class ObsticleAvoidanceScenario:
       return came_from
 
    def pathfind_nieve(self):
-
       came_from = breadth_first_search_modified(self.room, self.agent_fl)
 
       while self.agent_location != None:
@@ -83,7 +83,13 @@ class ObsticleAvoidanceScenario:
          row_out = ""
          for j in range(1, self.roomsize + 1):
 
-            if ((i, j) == self.agent_location):
+            if((i,j) == self.agent_sl):
+               row_out += " S "
+
+            elif((i,j) == self.agent_fl):
+               row_out += " F "
+
+            elif ((i, j) == self.agent_location):
                row_out += " O "
                self.agent_path.append((i,j))
 
@@ -96,10 +102,9 @@ class ObsticleAvoidanceScenario:
          print row_out
 
 # initializeing a scenario and accessing it's attributes
-scenario = ObsticleAvoidanceScenario('room.txt')
-print scenario.agent_sl
-print scenario.agent_fl
-print scenario.obsticle1.location
-print scenario.obsticle2.velocity
-scenario.pathfind_optimized()
+scenario1 = ObsticleAvoidanceScenario('room.txt')
+scenario2 = ObsticleAvoidanceScenario('room.txt')
+
+scenario1.pathfind_nieve()
+scenario2.pathfind_optimized()
 
