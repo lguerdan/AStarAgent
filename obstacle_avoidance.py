@@ -1,5 +1,5 @@
 import collections, heapq
-agent_path_locations = []
+
 class Queue:
    def __init__(self):
       self.elements = collections.deque()
@@ -56,32 +56,65 @@ class SquareGraph:
             print str(i) + str(j) + ":  " + str(graph.get_neighbors((i, j)))
 
 
-class Obstical(SquareGraph): # inherits from square graph so we can use in_graph method
-   def __init__(self, location, speed, velocity, graph):
+class Obstical(SquareGraph):
+   def __init__(self, location, speed, direction, graph):
       self.location = location
-      self.location_next = self.move()
+      self.location_next = None
       self.graph = graph
       self.speed = speed
-      self.velocity = velocity
+      self.direction = direction
       self.roomsize = graph.size
-      #also state for t + 1 location here
 
+   # obsticle driver function, incraments movement by one time interval
    def move(self):
+
+      num_moves = self.speed
+      while (num_moves > 0):
+
+         #init location_next on first iteration
+         if (self.location_next == None):
+            self.location_next = self.next()
+            self.correct_next()
+
+         self.location = self.location_next
+         self.location_next = self.next()
+         self.correct_next()
+         num_moves -= 1
+
+   # iterater-style function to get next location on current trajectory
+   def next(self):
+      direction_x, direction_y = self.direction
       x, y = self.location
-      velocity_x, velocity_y = self.velocity
-      speed_x, speed_y = self.speed
-      pos_x = (velocity_x * speed_x) + x
-      pos_y = (velocity_y * speed_y) + y
-      print pos_x, pos_y
+      pos_x = direction_x  + x
+      pos_y = direction_y  + y
+      return (pos_x, pos_y)
+
+   #given next obsticle location, correct trajectory by changing direction if out of bounds
+   def correct_next(self):
+
+      if (not self.in_graph(self.location_next)):
+         next_x, next_y = self.location_next
+         dir_x, dir_y = self.direction
+
+         if (next_y < 1):
+            dir_y = abs(dir_y)
+
+         if(next_y > self.roomsize):
+            dir_y = -1 * dir_y
+
+         if (next_x < 1):
+            dir_x = abs(dir_x)
+
+         if (next_x > self.roomsize):
+            dir_x = -1 * dir_x
+
+         self.direction = (dir_x, dir_y)
+         self.location_next = self.next()
 
 
-      '''
-      # obstical logic here.
-      1) Check graph size and boundaries (using in_graph method)
-      2) next position based on current velocity
-      3) We will also need to store state of t + 1 position to Check for collisions
-      '''
-
+   def in_graph(self,position):
+      (x, y) = position
+      return 1 <= x <= self.roomsize and 1 <= y <= self.roomsize
 
 # distance-based cost function for dijkstras
 def heuristic(a, b):
@@ -111,7 +144,6 @@ def breadth_first_search_modified(graph, start):
 def nieve_path_forward(graph, start, finish):
    came_from = breadth_first_search_modified(graph, finish)
    #Lets try swapping came from to go_to by exchanging keys and values
-   # go_to = dict((v,k) for k,v in came_from.iteritems())
 
    agent_position = start
    while agent_position != None:
@@ -120,7 +152,6 @@ def nieve_path_forward(graph, start, finish):
       agent_position = came_from[agent_position]
 
    print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
-
 
 def a_star_search(graph, start, goal):
    frontier = PriorityQueue()
@@ -144,4 +175,3 @@ def a_star_search(graph, start, goal):
             came_from[next] = current
 
    return came_from
-
