@@ -67,7 +67,6 @@ class Obstical(SquareGraph):
 
    # obsticle driver function, incraments movement by one time interval
    def move(self):
-
       num_moves = self.speed
       while (num_moves > 0):
 
@@ -91,7 +90,6 @@ class Obstical(SquareGraph):
 
    #given next obsticle location, correct trajectory by changing direction if out of bounds
    def correct_next(self):
-
       if (not self.in_graph(self.location_next)):
          next_x, next_y = self.location_next
          dir_x, dir_y = self.direction
@@ -110,7 +108,6 @@ class Obstical(SquareGraph):
 
          self.direction = (dir_x, dir_y)
          self.location_next = self.next()
-
 
    def in_graph(self,position):
       (x, y) = position
@@ -140,18 +137,6 @@ def breadth_first_search_modified(graph, start):
             came_from[next] = current
 
    return came_from
-
-def nieve_path_forward(graph, start, finish):
-   came_from = breadth_first_search_modified(graph, finish)
-   #Lets try swapping came from to go_to by exchanging keys and values
-
-   agent_position = start
-   while agent_position != None:
-      print agent_position
-      print_visual_graph_with_path(graph, agent_position)
-      agent_position = came_from[agent_position]
-
-   print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
 
 def a_star_search(graph, start, goal):
    frontier = PriorityQueue()
