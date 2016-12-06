@@ -1,9 +1,6 @@
 room.txt: pass
 room2.txt: pass
-room3.txt: pass (?)
-	+ Not sure what causes the initial path of came_from
-	  (resulting from the a-star search) to be the path that
-	  it is...
+room3.txt: pass
 room4.txt: pass
 room5.txt: pass
 room6.txt: pass (?)
@@ -15,39 +12,11 @@ room6.txt: pass (?)
 	+ Not sure why the agent follows the path that it does...
 room7.txt: pass
 room8.txt: pass
-room9.txt: pass (???) (!)
-	+ Raises more questions than it answers for me...
-		- Why is it that the initial planned path here appears
-		  different from ones that are plotted in a room of the
-		  same shape, being a straight, diagonal line as I
-		  expected the other two to be?
-		- Why is it that this example gives rise to an evasion
-		  error flag whereas the other examples do not?
-	- Only 3x3 example thus far in which agent travels diagonally
-	  towards L right away
+room9.txt: pass (?)
 	+ One of several examples of the agent moving from an
 	  escape space to a space along its path which is different
 	  than the one it just came from, which is a behavior I did
 	  not expect and can not yet fully explain...
-	  
-	* I FIGURED IT OUT!
-		- When the object's initial path is first determined by
-		  the a* algorithm, the algorithm plans AROUND the
-		  INITIAL positions of obstacles when plotting the
-		  route which the agent will take.
-		- However, if you modify this such that the initial path
-		  is not impacted by the initial positions of the objects,
-		  then this causes the program to enter an infinite loop
-		  of waiting in the same position if there is always an
-		  obstacle in the path of the agent (see room12.txt).
-		- Perhaps run an initial check on the objects to determine
-		  whether their behavior can be determined stationary
-		  before using a* to determine the initial path.
-		  	- Run one frame in which all you do is move the
-		  	  obstacles. If either obstacle remains in the same
-		  	  position from frame 1 to frame 2, then set the
-		  	  weight of that position to 1000, THEN use a*.
-	  
 	  
 room10.txt: pass
 room11.txt: pass
