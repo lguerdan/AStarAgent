@@ -1,4 +1,5 @@
 from obstacle_avoidance import *
+import sys, getopt, glob, os
 
 # Wrapper class for entire program. Has access to two obsticles, agent, and room functions
 class ObsticleAvoidanceScenario:
@@ -79,7 +80,7 @@ class ObsticleAvoidanceScenario:
 
          if (evading == True):
             print "Evasion logic being run"
-            
+
             if self.obsticle1.location in came_from_temp:
                 self.agent_location = came_from_temp[self.obsticle1.location]
                 del came_from_temp[self.obsticle1.location]
@@ -88,7 +89,7 @@ class ObsticleAvoidanceScenario:
                 del came_from_temp[self.obsticle2.location]
             else:
                 print "There has been an evasion error"
-            
+
             evading = False
 
          if (next_position != self.obsticle1.location and next_position != self.obsticle2.location):
@@ -143,7 +144,7 @@ class ObsticleAvoidanceScenario:
             if((i,j) == self.obsticle1.location or (i,j) == self.obsticle2.location):
                 # self.obsticle_path.append((i,j))
                 row_out += " O "
-            
+
             elif ((i, j) == self.agent_location):
                 row_out += " R "
                 self.agent_path.append((i,j))
@@ -173,54 +174,30 @@ class ObsticleAvoidanceScenario:
 scenario1 = ObsticleAvoidanceScenario('room10.txt')
 # scenario2 = ObsticleAvoidanceScenario('room.txt')
 
-# scenario1.pathfind_nieve()
-scenario1.pathfind_optimized()
-scenario1.test_collisions()
+def main(argv):
+   inputfile = ''
 
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
+   try:
+      inputfile = argv[0]
 
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
+      # check for read access, else error. With closes automatically because of context
+      try:
+         with open(inputfile) as fp:
+            pass
 
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
+      except IOError:
+          print "Could not read file"
 
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
+   except:
+      print 'python route_find.py <inputfile>'
+      sys.exit(2)
 
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
-
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
-
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
-
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
-
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
-
-# scenario1.print_graph_with_path()
-# scenario1.obsticle2.move()
-# scenario1.obsticle1.move()
+   scenario = ObsticleAvoidanceScenario(inputfile)
+   scenario.pathfind_optimized()
+   scenario.test_collisions()
 
 
 
-
-
-
-
+if __name__ == "__main__":
+   main(sys.argv[1:])
 
