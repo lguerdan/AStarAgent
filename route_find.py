@@ -14,7 +14,12 @@ class ObsticleAvoidanceScenario:
          in_file = [line.rstrip('\n') for line in open(input_file)]
          if (len(in_file) != 9):
             print "not correct size"
+         
 
+
+#         for line in in_file:
+#            if not isinstance(in_file[line], int ):
+#               print "incorrect formatting on line %d" % line
 
 
    def load_initial_state(self, input_file):
@@ -170,7 +175,7 @@ class ObsticleAvoidanceScenario:
       print "\n"
 
 # initializeing a scenario and accessing it's attributes
-scenario1 = ObsticleAvoidanceScenario('room10.txt')
+scenario1 = ObsticleAvoidanceScenario('room.txt')
 # scenario2 = ObsticleAvoidanceScenario('room.txt')
 
 # scenario1.pathfind_nieve()
