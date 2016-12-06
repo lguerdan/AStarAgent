@@ -52,6 +52,7 @@ class ObsticleAvoidanceScenario:
    def pathfind_optimized(self, optimized=True):
 
       if (optimized is True):
+
          self.room.weight[self.obsticle1.location] = 1000
          self.room.weight[self.obsticle2.location] = 1000
          came_from = a_star_search(self.room, self.agent_fl, self.agent_sl)
@@ -62,7 +63,7 @@ class ObsticleAvoidanceScenario:
          print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
 
       # when collision detected check step in cardinal directions
-      escape_sequence = [(1, 0), (-1,0), (0, 1), (0, -1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
+      escape_sequence = [(1, 0), (-1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
       came_from_temp = {}
       evading = False
 
@@ -77,28 +78,46 @@ class ObsticleAvoidanceScenario:
          next_position = came_from[self.agent_location]
 
          if (evading == True):
-            self.agent_location = came_from_temp[self.obsticle1.location]
-            if self.obsticle1.location in came_from_temp: del ame_from_temp[self.obsticle1.location]
+            print "Evasion logic being run"
+            
+            if self.obsticle1.location in came_from_temp:
+                self.agent_location = came_from_temp[self.obsticle1.location]
+                del came_from_temp[self.obsticle1.location]
+            elif self.obsticle2.location in came_from_temp:
+                self.agent_location = came_from_temp[self.obsticle2.location]
+                del came_from_temp[self.obsticle2.location]
+            else:
+                print "There has been an evasion error"
+            
+            evading = False
 
          if (next_position != self.obsticle1.location and next_position != self.obsticle2.location):
             self.agent_location = next_position
+            print "Proceeding as planned..."
 
          else:
             print "colision detected.. Adjusting movement"
 
             # halt for time cycle if possible
-            if(self.agent_location != self.obsticle1.location or self.agent_location != self.obsticle2.location):
+            if(self.agent_location != self.obsticle1.location and self.agent_location != self.obsticle2.location):
                print "Waiting it out.. Staying at current location this interval"
                pass
 
             else:
-               for detour in escape_sequence:
-                  offset = next_position + detour
-                  if (self.in_graph(offset) and (offset != self.obsticle2.location and offset != self.obsticle1.location)):
-                     print "Taking detour.. Moving to position %s" % (offset)
-                     came_from_temp[offset] = self.agent_location
-                     self.agent_location = offset
-                     evading = True
+               while(self.agent_location == self.obsticle1.location or self.agent_location == self.obsticle2.location):
+                   gen = (detour for detour in escape_sequence if evading != True)
+                   for detour in gen:
+                        offset = tuple(map(lambda x, y: x + y, self.agent_location, detour))
+                        print "Considering moving to %s" % (offset,)
+                        if (not self.room.in_graph(offset)):
+                            print ", but %s not in room" % (offset,)
+                        elif (offset == self.obsticle2.location or offset == self.obsticle1.location):
+                            print ", but %s would lead to collision" % (offset,)
+                        else:
+                            print "Taking detour.. Moving to position %s" % (offset,)
+                            came_from_temp[offset] = self.agent_location
+                            self.agent_location = offset
+                            evading = True
 
          self.game_states.append([self.agent_location, self.obsticle1.location, self.obsticle2.location])
          self.print_graph_with_path()
@@ -121,22 +140,26 @@ class ObsticleAvoidanceScenario:
          row_out = ""
          for j in range(1, self.roomsize + 1):
 
-            if((i,j) == self.agent_sl):
+            if((i,j) == self.obsticle1.location or (i,j) == self.obsticle2.location):
+                # self.obsticle_path.append((i,j))
+                row_out += " O "
+            
+            elif ((i, j) == self.agent_location):
+                row_out += " R "
+                self.agent_path.append((i,j))
+
+            elif((i,j) == self.agent_sl):
                row_out += " F "
 
             elif((i,j) == self.agent_fl):
                row_out += " L "
 
-            elif ((i, j) == self.agent_location):
-               row_out += " R "
-               self.agent_path.append((i,j))
-
             elif((i,j) in self.agent_path):
-               row_out += " R "
+               row_out += " + "
 
-            elif ((i, j) == self.obsticle1.location or (i, j) == self.obsticle2.location):
-               # self.obsticle_path.append((i,j))
-               row_out += " O "
+#            elif ((i, j) == self.obsticle1.location or (i, j) == self.obsticle2.location):
+#               # self.obsticle_path.append((i,j))
+#               row_out += " O "
 
             elif ((i, j) in self.obsticle_path):
                row_out += " O "
@@ -144,13 +167,14 @@ class ObsticleAvoidanceScenario:
             else:
                row_out += " - "
          print row_out
+      print "\n"
 
 # initializeing a scenario and accessing it's attributes
-scenario1 = ObsticleAvoidanceScenario('room.txt')
+scenario1 = ObsticleAvoidanceScenario('room10.txt')
 # scenario2 = ObsticleAvoidanceScenario('room.txt')
 
 # scenario1.pathfind_nieve()
-scenario1.pathfind_optimized(False)
+scenario1.pathfind_optimized()
 scenario1.test_collisions()
 
 # scenario1.print_graph_with_path()

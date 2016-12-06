@@ -109,6 +109,7 @@ class Obstical(SquareGraph):
          self.direction = (dir_x, dir_y)
          self.location_next = self.next()
 
+# Returns a boolean value based on whether the provided location is within the square room
    def in_graph(self,position):
       (x, y) = position
       return 1 <= x <= self.roomsize and 1 <= y <= self.roomsize
