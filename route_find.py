@@ -3,10 +3,19 @@ from obstacle_avoidance import *
 # Wrapper class for entire program. Has access to two obsticles, agent, and room functions
 class ObsticleAvoidanceScenario:
    def __init__(self, input_file):
+      self.validate_input_file(input_file)
       self.load_initial_state(input_file)
       self.agent_path = []
       self.obsticle_path = []
       self.game_states = []# temp for checking collisions
+
+   def validate_input_file(self, input_file):
+      with open(input_file) as f:
+         in_file = [line.rstrip('\n') for line in open(input_file)]
+         if (len(in_file) != 9):
+            print "not correct size"
+
+
 
    def load_initial_state(self, input_file):
       with open(input_file) as f:
