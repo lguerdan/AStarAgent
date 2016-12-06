@@ -90,6 +90,13 @@ class Obstical(SquareGraph):
 
    #given next obsticle location, correct trajectory by changing direction if out of bounds
    def correct_next(self):
+       # I had to insert this init into this method iot use the method when checking whether the obstacles are static or not prior to finding the initial path *****
+       # However, this function, when called as it is around line 50 in route_find.py, returns "None", so that's not exactly what I want... *****
+      # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      if (self.location_next == None):
+         self.location_next = self.next()
+         self.correct_next()
+      # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       if (not self.in_graph(self.location_next)):
          next_x, next_y = self.location_next
          dir_x, dir_y = self.direction
@@ -109,6 +116,7 @@ class Obstical(SquareGraph):
          self.direction = (dir_x, dir_y)
          self.location_next = self.next()
 
+# Returns a boolean value based on whether the provided location is within the square room
    def in_graph(self,position):
       (x, y) = position
       return 1 <= x <= self.roomsize and 1 <= y <= self.roomsize
