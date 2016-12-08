@@ -1,5 +1,5 @@
 from obstacle_avoidance import *
-import sys, getopt, glob, os
+import sys, getopt, glob, os, argparse
 
 # Wrapper class for entire program. Has access to two obsticles, agent, and room functions
 class ObsticleAvoidanceScenario:
@@ -23,7 +23,7 @@ class ObsticleAvoidanceScenario:
       elif(error == 8): raise ValueError("Input error in ninth line")
       elif(error == 9): raise ValueError("Input error: incorrect size")
       else: print "Something went wrong..."
-   
+
    def validate_integer(self, num, min, line):
       try:
          val = int(num)
@@ -255,30 +255,37 @@ class ObsticleAvoidanceScenario:
          print row_out
       print "\n"
 
-# initializeing a scenario and accessing it's attributes
-# scenario1 = ObsticleAvoidanceScenario('room.txt')
-# scenario2 = ObsticleAvoidanceScenario('room.txt')
 
 def main(argv):
    inputfile = ''
 
+   # Set up argument parser
+   ap = argparse.ArgumentParser()
+
+   ap.add_argument("fname", help="name of room file")
+   ap.add_argument("nieve", nargs='?', default=True, help="False for nonoptimized search")
+
+   a = ap.parse_args()
+
+   # check for read access, else error. With closes automatically because of context
    try:
-      inputfile = argv[0]
+      with open(a.fname) as fp:
+         pass
 
-      # check for read access, else error. With closes automatically because of context
-      try:
-         with open(inputfile) as fp:
-            pass
+   except IOError:
+       print "Could not read file."
+       exit(2)
 
-      except IOError:
-          print "Could not read file"
 
-   except:
-      print 'python route_find.py <inputfile>'
-      sys.exit(2)
+   scenario = ObsticleAvoidanceScenario(a.fname)
 
-   scenario = ObsticleAvoidanceScenario(inputfile)
-   scenario.pathfind_optimized()
+   print a.nieve
+
+   if(a.nieve == "False"):
+      scenario.pathfind_optimized(False)
+   else:
+      scenario.pathfind_optimized()
+
    scenario.test_collisions()
 
 
