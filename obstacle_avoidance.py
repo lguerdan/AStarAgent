@@ -1,4 +1,5 @@
 import collections, heapq
+from random import randint
 
 # Used in bfs
 class Queue:
@@ -30,9 +31,10 @@ class PriorityQueue:
       return heapq.heappop(self.elements)[1]
 
 class SquareGraph:
-   def __init__(self, size):
+   def __init__(self, size, launchpad=False, speedbump=False):
       self.size = size
       self.weight = {}
+
 
    def in_graph(self, position):
       (x, y) = position
@@ -62,18 +64,28 @@ class SquareGraph:
 
 # Wrapper for object state and behavior
 class Obstical(SquareGraph):
-   def __init__(self, location, speed, direction, graph):
+   def __init__(self, location, speed, direction, graph, launcher, launchspeed, speedbump):
       self.location = location
       self.location_next = None
       self.graph = graph
       self.speed = speed
       self.direction = direction
       self.roomsize = graph.size
+      self.launcher = launcher
+      self.launchspeed = launchspeed
+      self.speedbump = speedbump
 
    # obsticle driver function, incraments movement by one time interval
    def move(self):
-      num_moves = self.speed
+      if (self.location == self.launcher):
+         self.speed += self.launchspeed
 
+      if (self.location == self.speedbump):
+         if(self.speed >=2):
+            self.speed -= 1
+
+
+      num_moves = self.speed
       # If speed greater than once, break up movement interval for proper movement
       while (num_moves > 0):
 

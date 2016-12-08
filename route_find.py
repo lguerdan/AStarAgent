@@ -3,11 +3,12 @@ import sys, getopt, glob, os, argparse
 
 # Wrapper class for entire program. Has access to two obsticles, agent, and room functions
 class ObsticleAvoidanceScenario:
-   def __init__(self, input_file):
+   def __init__(self, input_file, launcher=False, speedbump=False):
+
+      print launcher
       self.validate_input_file(input_file)
-      self.load_initial_state(input_file)
+      self.load_initial_state(input_file, launcher, speedbump)
       self.agent_path = []
-      self.obsticle_path = []
       self.game_states = []# temp for checking collisions
 
    # a helper function for validate_input_file()
@@ -83,33 +84,41 @@ class ObsticleAvoidanceScenario:
       with open(input_file) as f:
          in_file = [line.rstrip('\n') for line in open(input_file)]
          if (len(in_file) != 9): self.raise_error(9)
-      # check first line of input
+      # check each line of input
          self.validate_integer(in_file[0], 2, 0)
-      # check second line of input
          self.validate_tuple(in_file[1], 1)
-      # check third line of input
          self.validate_tuple(in_file[2], 2)
-      # check fourth line of input
          self.validate_tuple(in_file[3], 3)
-      # check fifth line of input
          self.validate_integer(in_file[4], 0, 4)
-      # check sixth line of input
          self.validate_dir_tuple(in_file[5], 5)
-      # check seventh line of input
          self.validate_tuple(in_file[6], 6)
-      # check eighth line of input
          self.validate_integer(in_file[7], 0, 7)
-      # check ninth line of input
          self.validate_dir_tuple(in_file[8], 8)
-      print "Input file looks to be properly formatted"
 
-   def load_initial_state(self, input_file):
+   def load_initial_state(self, input_file, launcher, speedbump):
       with open(input_file) as f:
          in_file = [line.rstrip('\n') for line in open(input_file)]
 
       # Agent
       self.roomsize = int(in_file[0])
       self.room = SquareGraph(self.roomsize)
+
+      #Speedbump and launcher
+      # randomly generate launcher. Speeds by 1 or two when hit
+      if (launcher == True):
+         self.launcher = (randint(1,self.roomsize), randint(1,self.roomsize))
+         self.launchspeed = randint(1,2)
+         print "Launcher speed " + str(self.launchspeed) + " placed at " + str(self.launcher)
+      else:
+         self.launcher = (-1, -1)
+         self.launchspeed = 0
+
+      # randomly generate speed bump. Slows obsticles -1 speed when hit
+      if (speedbump == True):
+         self.speedbump = (randint(1,self.roomsize), randint(1,self.roomsize))
+         print "Speedbump placed at " + str(self.speedbump)
+      else:
+         self.speedbump = (1,-1)
 
       self.agent_sl = self.instring_to_tuple(in_file[1])
       self.agent_fl= self.instring_to_tuple(in_file[2])
@@ -120,13 +129,15 @@ class ObsticleAvoidanceScenario:
       obsticle1_sl = self.instring_to_tuple(in_file[3])
       obsticle1_speed = int(in_file[4])
       obsticle1_direction = self.instring_to_tuple(in_file[5])
-      self.obsticle1 = Obstical(obsticle1_sl, obsticle1_speed, obsticle1_direction, self.room)
+      self.obsticle1 = Obstical(obsticle1_sl, obsticle1_speed, obsticle1_direction, self.room, self.launcher, self.launchspeed, self.speedbump)
 
       # Obsticle 2
       obsticle2_sl = self.instring_to_tuple(in_file[6])
       obsticle2_speed = int(in_file[7])
       obsticle2_direction = self.instring_to_tuple(in_file[8])
-      self.obsticle2 = Obstical(obsticle2_sl, obsticle2_speed, obsticle2_direction, self.room)
+      self.obsticle2 = Obstical(obsticle2_sl, obsticle2_speed, obsticle2_direction, self.room, self.launcher, self.launchspeed, self.speedbump)
+
+
 
    # helper function to check for collisions:
    def test_collisions(self):
@@ -136,7 +147,7 @@ class ObsticleAvoidanceScenario:
       else:
          print "No collisions detected"
 
-   def pathfind_optimized(self, optimized=True):
+   def pathfind(self, optimized=True):
 
       if (optimized is True):
 
@@ -155,7 +166,6 @@ class ObsticleAvoidanceScenario:
       evading = False
 
       self.print_graph_with_path()
-      #print self.agent_location
 
       while self.agent_location != self.agent_fl and self.agent_waits < 6:
          self.obsticle1.move()
@@ -211,9 +221,11 @@ class ObsticleAvoidanceScenario:
          self.print_graph_with_path()
 
       #self.print_graph_with_path()
-      if( self.agent_waits >= 6 ): raise ValueError("Robot is unable to reach the finish")
-      else: return came_from
-
+      if( self.agent_waits >= 6 ):
+         print "Robot is unable to reach the finish"
+         exit()
+      else:
+         return came_from
 
    # Helper function for laoding tuples
    def instring_to_tuple(self,instring):
@@ -229,7 +241,7 @@ class ObsticleAvoidanceScenario:
          for j in range(1, self.roomsize + 1):
 
             if((i,j) == self.obsticle1.location or (i,j) == self.obsticle2.location):
-                # self.obsticle_path.append((i,j))
+
                 row_out += " O "
 
             elif ((i, j) == self.agent_location):
@@ -245,12 +257,11 @@ class ObsticleAvoidanceScenario:
             elif((i,j) in self.agent_path):
                row_out += " + "
 
-#            elif ((i, j) == self.obsticle1.location or (i, j) == self.obsticle2.location):
-#               # self.obsticle_path.append((i,j))
-#               row_out += " O "
+            elif((i,j) == self.launcher):
+               row_out += " " + str(self.launchspeed) + " "
 
-            elif ((i, j) in self.obsticle_path):
-               row_out += " O "
+            elif((i,j) == self.speedbump):
+               row_out += " ~ "
 
             else:
                row_out += " - "
@@ -265,7 +276,9 @@ def main(argv):
    ap = argparse.ArgumentParser()
 
    ap.add_argument("fname", help="name of room file")
-   ap.add_argument("nieve", nargs='?', default=True, help="False for nonoptimized search")
+   ap.add_argument("nieve", nargs='?', default=True, help="'False' for nonoptimized search")
+   ap.add_argument("speedbump", nargs='?', default=False, help="'True' for randomly generated speed bump")
+   ap.add_argument("launcher", nargs='?', default=False, help="'True' for randomly generated launcher")
 
    a = ap.parse_args()
 
@@ -278,18 +291,14 @@ def main(argv):
        print "Could not read file."
        exit(2)
 
+   a.speedbump = (False if(a.speedbump == "False") else True)
+   a.launcher = (False if(a.launcher == "False") else True)
+   scenario = ObsticleAvoidanceScenario(a.fname, a.speedbump, a.launcher)
 
-   scenario = ObsticleAvoidanceScenario(a.fname)
 
-   print a.nieve
-
-   if(a.nieve == "False"):
-      scenario.pathfind_optimized(False)
-   else:
-      scenario.pathfind_optimized()
-
+   a.nieve = (False if(a.nieve == "False") else True)
+   scenario.pathfind(a.nieve)
    scenario.test_collisions()
-
 
 
 if __name__ == "__main__":
