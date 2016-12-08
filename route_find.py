@@ -10,18 +10,98 @@ class ObsticleAvoidanceScenario:
       self.obsticle_path = []
       self.game_states = []# temp for checking collisions
 
+   # a helper function for validate_input_file()
+   def raise_error(self, error):
+      if  (error == 0): raise ValueError("Input error in first line")
+      elif(error == 1): raise ValueError("Input error in second line")
+      elif(error == 2): raise ValueError("Input error in third line")
+      elif(error == 3): raise ValueError("Input error in fourth line")
+      elif(error == 4): raise ValueError("Input error in fifth line")
+      elif(error == 5): raise ValueError("Input error in sixth line")
+      elif(error == 6): raise ValueError("Input error in seventh line")
+      elif(error == 7): raise ValueError("Input error in eighth line")
+      elif(error == 8): raise ValueError("Input error in ninth line")
+      elif(error == 9): raise ValueError("Input error: incorrect size")
+      else: print "Something went wrong..."
+   
+   def validate_integer(self, num, min, line):
+      try:
+         val = int(num)
+      except ValueError as err:
+         self.raise_error(line)
+      val = int(num)
+      if (val < min): self.raise_error(line)
+
+   # helper function for validate_input_file()
+   def validate_tuple(self, tuple, line):
+      if(not tuple.endswith(")",4)):
+         self.raise_error(line)
+      if( tuple[0] != '(' ): self.raise_error(line)
+      c = 1
+      while tuple[c].isdigit(): c += 1
+      if( c == 1 ): self.raise_error(line)
+      if( tuple[c] != ',' ): self.raise_error(line)
+      c += 1
+      d = 0
+      while tuple[c].isdigit():
+         c += 1
+         d = d * 10 + int(tuple[c-1])
+      if( d == 0 ): self.raise_error(line)
+      end = str(d) + ')'
+      if(not tuple.endswith(end,3)): self.raise_error(line)
+
+   def validate_dir_tuple(self, tuple, line):
+      if(not tuple.endswith(")",4)):
+         self.raise_error(line)
+      if( tuple[0] != '(' ): self.raise_error(line)
+      a = 0
+      c = 1
+      if( tuple[c] == '+' or tuple[c] == '-' ):
+         a = 1
+         c += 1
+      if( tuple[c].isdigit() ):
+         if( int(tuple[c]) != a ):
+            self.raise_error(line)
+         c += 1
+      else:
+         self.raise_error(line)
+      if( tuple[c] != ',' ): self.raise_error(line)
+      a = 0
+      c += 1
+      if( tuple[c] == '+' or tuple[c] == '-' ):
+         a = 1
+         c += 1
+      if( tuple[c].isdigit() ):
+         if( int(tuple[c]) != a ):
+            self.raise_error(line)
+      else:
+         self.raise_error(line)
+      end = str(a) + ')'
+      if(not tuple.endswith(end,3)): self.raise_error(line)
+
    def validate_input_file(self, input_file):
       with open(input_file) as f:
          in_file = [line.rstrip('\n') for line in open(input_file)]
-         if (len(in_file) != 9):
-            print "not correct size"
-         
-
-
-#         for line in in_file:
-#            if not isinstance(in_file[line], int ):
-#               print "incorrect formatting on line %d" % line
-
+         if (len(in_file) != 9): self.raise_error(9)
+      # check first line of input
+         self.validate_integer(in_file[0], 2, 0)
+      # check second line of input
+         self.validate_tuple(in_file[1], 1)
+      # check third line of input
+         self.validate_tuple(in_file[2], 2)
+      # check fourth line of input
+         self.validate_tuple(in_file[3], 3)
+      # check fifth line of input
+         self.validate_integer(in_file[4], 0, 4)
+      # check sixth line of input
+         self.validate_dir_tuple(in_file[5], 5)
+      # check seventh line of input
+         self.validate_tuple(in_file[6], 6)
+      # check eighth line of input
+         self.validate_integer(in_file[7], 0, 7)
+      # check ninth line of input
+         self.validate_dir_tuple(in_file[8], 8)
+      print "Input file looks to be properly formatted"
 
    def load_initial_state(self, input_file):
       with open(input_file) as f:
@@ -74,7 +154,7 @@ class ObsticleAvoidanceScenario:
       evading = False
 
       self.print_graph_with_path()
-      print self.agent_location
+      #print self.agent_location
 
       while self.agent_location != self.agent_fl:
          self.obsticle1.move()
@@ -128,7 +208,7 @@ class ObsticleAvoidanceScenario:
          self.game_states.append([self.agent_location, self.obsticle1.location, self.obsticle2.location])
          self.print_graph_with_path()
 
-      self.print_graph_with_path()
+      #self.print_graph_with_path()
 
       return came_from
 
@@ -176,7 +256,7 @@ class ObsticleAvoidanceScenario:
       print "\n"
 
 # initializeing a scenario and accessing it's attributes
-scenario1 = ObsticleAvoidanceScenario('room.txt')
+# scenario1 = ObsticleAvoidanceScenario('room.txt')
 # scenario2 = ObsticleAvoidanceScenario('room.txt')
 
 def main(argv):
