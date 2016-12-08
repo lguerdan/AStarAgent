@@ -25,6 +25,7 @@ class ObsticleAvoidanceScenario:
       else: print "Something went wrong..."
       exit()
    
+   # helper function for validate_input_file()
    def validate_integer(self, num, min, line):
       if( num.isdigit() ):
          val = int(num)
@@ -50,6 +51,7 @@ class ObsticleAvoidanceScenario:
       end = str(d) + ')'
       if(not tuple.endswith(end,3)): self.raise_error(line)
 
+   # helper function for validate_input_file()
    def validate_dir_tuple(self, tuple, line):
       if(not tuple.endswith(")",4)):
          self.raise_error(line)
