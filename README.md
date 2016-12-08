@@ -1,4 +1,3 @@
-——— INPUT ———
 ##Usage:
 `python route_find.py <inputfile> <boolean nieve> <boolean launcher> <boolean speedbump>`
 
@@ -25,10 +24,6 @@ The previous object speed will be decremented by one if it is greater than 1.
 
 
 
-
-——— OUTPUT ———
-
-
 If the program determines that the input file is not formatted properly,
 it will proceed to print a message describing which line of the input was formatted incorrectly (in the case that multiple lines are incorrect, it will only mention the first one of them) or it will print the message, `Input error: incorrect filesize`.
 If the program determines that the input file is formatted properly, it will proceed to print a number of maps as well as the coordinates of each object.
@@ -40,16 +35,16 @@ the program will exit and state the robot finish.
 
 
 
-#KEY (items listed in order of priority on map)
+##KEY (items listed in order of priority on map)
 
-O  —  obstacle
-R  —  robot
-F  —  starting point
-L  —  finishing point
-+  —  space visited by robot
--  —  empty space
-~  —  speed bump (will reduce an obstacle’s speed by 1, but to no lower than 1)
-1 or 2  —  launchpad (will increase an obstacle’s speed by the number displayed)
+O  obstacle
+R  robot
+F  starting point
+L  finishing point
++  space visited by robot
+-  empty space
+~  speed bump (will reduce an obstacle’s speed by 1, but to no lower than 1)
+(1 or 2)  launchpad (will increase an obstacle’s speed by the number displayed)
 
 
 
