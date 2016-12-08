@@ -1,5 +1,6 @@
 import collections, heapq
 
+# Used in bfs
 class Queue:
    def __init__(self):
       self.elements = collections.deque()
@@ -13,6 +14,7 @@ class Queue:
    def next(self):
       return self.elements.popleft()
 
+# Used in a star to mantain set of min-distance nodes
 class PriorityQueue:
    def __init__(self):
       self.elements = []
@@ -36,12 +38,14 @@ class SquareGraph:
       (x, y) = position
       return 1 <= x <= self.size and 1 <= y <= self.size
 
+   #Utility function to return valid adjacent nodes to current position
    def get_neighbors(self, position):
       (x, y) = position
       neighbors = [(x + 1, y), (x - 1, y), (x, y+ 1), (x, y - 1), (x - 1, y - 1), (x + 1, y + 1), (x-1, y + 1), (x + 1, y - 1)]
       neighbors = filter(self.in_graph, neighbors)
       return neighbors
 
+   # Helper function to return cost of visiting 2 nodes
    def get_cost(self, to_node, from_node):
       if (to_node in self.weight):
          return self.weight[to_node]
@@ -56,6 +60,7 @@ class SquareGraph:
             print str(i) + str(j) + ":  " + str(graph.get_neighbors((i, j)))
 
 
+# Wrapper for object state and behavior
 class Obstical(SquareGraph):
    def __init__(self, location, speed, direction, graph):
       self.location = location
@@ -68,6 +73,8 @@ class Obstical(SquareGraph):
    # obsticle driver function, incraments movement by one time interval
    def move(self):
       num_moves = self.speed
+
+      # If speed greater than once, break up movement interval for proper movement
       while (num_moves > 0):
 
          #init location_next on first iteration
@@ -75,6 +82,7 @@ class Obstical(SquareGraph):
             self.location_next = self.next()
             self.correct_next()
 
+         # Update location to next position and correct if necessary
          self.location = self.location_next
          self.location_next = self.next()
          self.correct_next()
@@ -139,7 +147,9 @@ def breadth_first_search_modified(graph, start):
 
    return came_from
 
+# Optimized search from start to finsih, uses heuristic and dijkstras algorithm.
 def a_star_search(graph, start, goal):
+   # Mantain set of next nodes to visit
    frontier = PriorityQueue()
    frontier.put(start, 0)
    came_from = {}
@@ -147,17 +157,22 @@ def a_star_search(graph, start, goal):
    came_from[start] = None
    cost_so_far[start] = 0
 
+   #While nodes unvisited, keep visiting frontier nodes
    while not frontier.isempty():
       current = frontier.get()
       if current == goal:
          break
 
       for next in graph.get_neighbors(current):
+
+         #Store current cost for later features like walls if added
          new_cost = cost_so_far[current] + graph.get_cost(next, current)
          if next not in cost_so_far or new_cost < cost_so_far[next]:
             cost_so_far[next] = new_cost
+            # Set priority based on manhattan distance
             priority = new_cost + heuristic(goal, next)
             frontier.put(next, priority)
             came_from[next] = current
 
+   #Return verticies came from
    return came_from
