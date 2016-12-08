@@ -176,6 +176,7 @@ class ObsticleAvoidanceScenario:
          next_position = came_from[self.agent_location]
 
          if (evading == True):
+            self.agent_waits = 0
             if self.obsticle1.location in came_from_temp:
                 self.agent_location = came_from_temp[self.obsticle1.location]
                 del came_from_temp[self.obsticle1.location]
@@ -186,27 +187,28 @@ class ObsticleAvoidanceScenario:
             evading = False
 
          if (next_position != self.obsticle1.location and next_position != self.obsticle2.location):
+            self.agent_waits = 0
             self.agent_location = next_position
 
-            # halt for time cycle if possible
-            if(self.agent_location != self.obsticle1.location and self.agent_location != self.obsticle2.location):
-               self.agent_waits += 1
-               pass
+         # halt for time cycle if possible
+         if(self.agent_location != self.obsticle1.location and self.agent_location != self.obsticle2.location):
+            self.agent_waits += 1
 
-            else:
-               # if the next location and current location conflict, re-route to near by spot
-               while(self.agent_location == self.obsticle1.location or self.agent_location == self.obsticle2.location):
-                   gen = (detour for detour in escape_sequence if evading != True)
-                   for detour in gen:
-                        offset = tuple(map(lambda x, y: x + y, self.agent_location, detour))
-                        if (not self.room.in_graph(offset)):
-                            pass
-                        elif (offset == self.obsticle2.location or offset == self.obsticle1.location):
-                            pass
-                        else:
-                            came_from_temp[offset] = self.agent_location
-                            self.agent_location = offset
-                            evading = True
+         else:
+            self.agent_waits = 0
+            # if the next location and current location conflict, re-route to near by spot
+            while(self.agent_location == self.obsticle1.location or self.agent_location == self.obsticle2.location):
+                gen = (detour for detour in escape_sequence if evading != True)
+                for detour in gen:
+                     offset = tuple(map(lambda x, y: x + y, self.agent_location, detour))
+                     if (not self.room.in_graph(offset)):
+                         pass
+                     elif (offset == self.obsticle2.location or offset == self.obsticle1.location):
+                         pass
+                     else:
+                         came_from_temp[offset] = self.agent_location
+                         self.agent_location = offset
+                         evading = True
 
          self.game_states.append([self.agent_location, self.obsticle1.location, self.obsticle2.location])
          self.print_graph_with_path()
@@ -260,7 +262,6 @@ class ObsticleAvoidanceScenario:
 
 
 def main(argv):
-   inputfile = ''
 
    # Set up argument parser
    ap = argparse.ArgumentParser()
@@ -281,8 +282,8 @@ def main(argv):
        print "Could not read file."
        exit(2)
 
-   a.speedbump = (False if(a.speedbump == "False") else True)
-   a.launcher = (False if(a.launcher == "False") else True)
+   a.speedbump = (True if(a.speedbump == "True") else False)
+   a.launcher = (True if(a.launcher == "True") else False)
    scenario = ObsticleAvoidanceScenario(a.fname, a.speedbump, a.launcher)
 
 
@@ -293,4 +294,3 @@ def main(argv):
 
 if __name__ == "__main__":
    main(sys.argv[1:])
-
