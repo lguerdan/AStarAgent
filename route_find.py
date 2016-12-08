@@ -12,25 +12,25 @@ class ObsticleAvoidanceScenario:
 
    # a helper function for validate_input_file()
    def raise_error(self, error):
-      if  (error == 0): raise ValueError("Input error in first line")
-      elif(error == 1): raise ValueError("Input error in second line")
-      elif(error == 2): raise ValueError("Input error in third line")
-      elif(error == 3): raise ValueError("Input error in fourth line")
-      elif(error == 4): raise ValueError("Input error in fifth line")
-      elif(error == 5): raise ValueError("Input error in sixth line")
-      elif(error == 6): raise ValueError("Input error in seventh line")
-      elif(error == 7): raise ValueError("Input error in eighth line")
-      elif(error == 8): raise ValueError("Input error in ninth line")
-      elif(error == 9): raise ValueError("Input error: incorrect size")
+      if  (error == 0): print "Input error in first line"
+      elif(error == 1): print "Input error in second line"
+      elif(error == 2): print "Input error in third line"
+      elif(error == 3): print "Input error in fourth line"
+      elif(error == 4): print "Input error in fifth line"
+      elif(error == 5): print "Input error in sixth line"
+      elif(error == 6): print "Input error in seventh line"
+      elif(error == 7): print "Input error in eighth line"
+      elif(error == 8): print "Input error in ninth line"
+      elif(error == 9): print "Input error: incorrect filesize"
       else: print "Something went wrong..."
+      exit()
    
    def validate_integer(self, num, min, line):
-      try:
+      if( num.isdigit() ):
          val = int(num)
-      except ValueError as err:
+         if (val < min): self.raise_error(line)
+      else:
          self.raise_error(line)
-      val = int(num)
-      if (val < min): self.raise_error(line)
 
    # helper function for validate_input_file()
    def validate_tuple(self, tuple, line):
@@ -114,6 +114,7 @@ class ObsticleAvoidanceScenario:
       self.agent_sl = self.instring_to_tuple(in_file[1])
       self.agent_fl= self.instring_to_tuple(in_file[2])
       self.agent_location = self.agent_sl
+      self.agent_waits = 0
 
       # Obsticle 1
       obsticle1_sl = self.instring_to_tuple(in_file[3])
@@ -156,7 +157,7 @@ class ObsticleAvoidanceScenario:
       self.print_graph_with_path()
       #print self.agent_location
 
-      while self.agent_location != self.agent_fl:
+      while self.agent_location != self.agent_fl and self.agent_waits < 6:
          self.obsticle1.move()
          self.obsticle2.move()
 
@@ -187,6 +188,7 @@ class ObsticleAvoidanceScenario:
             # halt for time cycle if possible
             if(self.agent_location != self.obsticle1.location and self.agent_location != self.obsticle2.location):
                print "Waiting it out.. Staying at current location this interval"
+               self.agent_waits += 1
                pass
 
             else:
@@ -209,8 +211,8 @@ class ObsticleAvoidanceScenario:
          self.print_graph_with_path()
 
       #self.print_graph_with_path()
-
-      return came_from
+      if( self.agent_waits >= 6 ): raise ValueError("Robot is unable to reach the finish")
+      else: return came_from
 
 
    # Helper function for laoding tuples
