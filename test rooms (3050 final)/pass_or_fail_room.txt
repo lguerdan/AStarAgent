@@ -1,0 +1,168 @@
+room.txt: pass
+room2.txt: pass
+room3.txt: pass
+room4.txt: pass
+room5.txt: pass
+room6.txt: pass (?)
+	- error fixed (account for both obstacles in evasion logic)
+	- evasion bugs fixed by correcting issue pertaining to 
+	  resetting escape sequence
+	- bug fixed by correcting issue pertaining to exiting
+	  escape sequence at proper time
+	+ Not sure why the agent follows the path that it does...
+room7.txt: pass
+room8.txt: pass
+room9.txt: pass (?)
+	+ One of several examples of the agent moving from an
+	  escape space to a space along its path which is different
+	  than the one it just came from, which is a behavior I did
+	  not expect and can not yet fully explain...
+	  
+room10.txt: pass
+room11.txt: pass
+	- Slightly suspicious about evasion logic. Perhaps check
+	  evasion logic and ensure it actually does what I think
+	  it does...
+
+room12.txt : pass
+room13.txt: pass (?)
+	+ Initial path planned for 3x3 room is different from
+	  ones I've seen produced in other 3x3 rooms (such as 3,
+	  4, 5, 9, & 12)
+room14.txt: pass (?)
+	- Even when allowed to travel a straight diagonal path
+	  unimpeded, the agent's initial path seems to differ,
+	  taking it a long way around as opposed to traveling in
+	  a straight line as I would expect...
+	  
+	  
+———————————— BAD ROOMS ————————————
+
+———————— FAIL ————————
+
+bad_room1.txt: pass
+	- Everything is 1... everything.....
+	+ calls input error on first line bc it's < 2
+bad_room2.txt: fail
+	- start:(0,1)
+	+ "IndexError: index out of range"
+bad_room3.txt: fail
+	- finish point outside of room
+	+ agent goes out of room to finish point anyway
+bad_room4.txt: pass
+	- obstacle1 outside of room
+	+ object finds its way into room eventually and then
+	  proceeds to behave normally
+bad_room5.txt: pass
+	- obstacle2 outside of room
+	+ pass
+bad_room6.txt: fail
+	- everything outside of room
+	+ "IndexError: index out of range"
+bad_room7.txt: pass
+	- obstacle and agent on same position
+	+ agent an obstacle go their separate ways on the
+	  first turn and no collision error is detected
+bad_room8.txt: fail *****
+	- stationary object on finish point
+	+ infinite loop waiting next to finish point
+bad_room9.txt: pass
+	- agent on finish point
+	+ finishes after displaying one frame
+bad_room10.txt: pass
+	- obstacles on same position
+	+ ran as expected
+bad_room11.txt: fail *****
+	- obstacles alternate being on finish point
+	+ infinite loop waiting next to finish point
+	
+———————— PASS ————————
+
+bad_room12.txt: pass
+	- obstacles have velocity of 2381 and 2753
+bad_room13.txt: pass
+	- start point same as finish point
+	
+	
+	
+BE CAREFUL WHEN TESTING THIS ONE!!!	
+huge_room.txt:
+
+	
+	
+	
+———————————— INPUT TESTING ————————————
+
+——————— FAIL FILES ————————
+
+——— line 1 ———
+input3.txt:-4
+input4.txt:(newline)
+input5.txt:a
+input6.txt:2.5
+input7.txt:2+2
+input8.txt:3/2
+	
+——— line 2 ———
+input9.txt:2,2)
+input10.txt:a2,2)
+input11.txt:(a,2)
+input12.txt:(-2,2)
+input13.txt:(22)
+input14.txt:(2a2)
+input15.txt:(2,a)
+input16.txt:(2,-2)
+input17.txt:(2,2		*
+input18.txt:(2,2a
+input19.txt:(2,2))		*
+
+——— line 3 ———
+input20.txt:2,4)
+input21.txt:a2,4)
+input22.txt:(a,4)
+input23.txt:(-2,4)
+input24.txt:(24)
+input25.txt:(2a4)
+input26.txt:(2,a)
+input27.txt:(2,-4)
+input28.txt:(2,4
+input29.txt:(2,4a
+input30.txt:(2,4))
+
+——— line 4 ———
+input31.txt:2,3)
+input32.txt:a2,3)
+input33.txt:(a,3)
+input34.txt:(-2,3)
+input35.txt:(23)
+input36.txt:(2a3)
+input37.txt:(2,a)
+input38.txt:(2,-3)
+input39.txt:(2,3
+input40.txt:(2,3a
+input41.txt:(2,3))
+
+——— line 5 ———
+input42.txt:4a
+input43.txt:a
+input44.txt:(newline)
+
+——— line 6 ———
+input45.txt:+1,0)
+input46.txt:a+1,0)
+input47.txt:(0,-1))
+input48.txt:(+1,1)
+input49.txt:(+1,a1)
+input50.txt:(+1a-1)
+input51.txt:(0,-1
+input52.txt:(+a,
+input53.txt:((0,-1)
+
+input54.txt:(+3,0)
+input55.txt:(0,+0)
+input56.txt:(-1,+0)
+input57.txt:(+-1,0)
+
+input58.txt:(-111111,000000)
+input59.txt: (-1,)
+input60.txt:(-1, 0)

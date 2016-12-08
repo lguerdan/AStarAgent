@@ -114,6 +114,7 @@ class ObsticleAvoidanceScenario:
       self.agent_sl = self.instring_to_tuple(in_file[1])
       self.agent_fl= self.instring_to_tuple(in_file[2])
       self.agent_location = self.agent_sl
+      self.agent_waits = 0
 
       # Obsticle 1
       obsticle1_sl = self.instring_to_tuple(in_file[3])
@@ -156,7 +157,7 @@ class ObsticleAvoidanceScenario:
       self.print_graph_with_path()
       #print self.agent_location
 
-      while self.agent_location != self.agent_fl:
+      while self.agent_location != self.agent_fl and self.agent_waits < 6:
          self.obsticle1.move()
          self.obsticle2.move()
 
@@ -187,6 +188,7 @@ class ObsticleAvoidanceScenario:
             # halt for time cycle if possible
             if(self.agent_location != self.obsticle1.location and self.agent_location != self.obsticle2.location):
                print "Waiting it out.. Staying at current location this interval"
+               self.agent_waits += 1
                pass
 
             else:
@@ -209,8 +211,8 @@ class ObsticleAvoidanceScenario:
          self.print_graph_with_path()
 
       #self.print_graph_with_path()
-
-      return came_from
+      if( self.agent_waits >= 6 ): raise ValueError("Robot is unable to reach the finish")
+      else: return came_from
 
 
    # Helper function for laoding tuples
