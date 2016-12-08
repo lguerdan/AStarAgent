@@ -5,7 +5,6 @@ import sys, getopt, glob, os, argparse
 class ObsticleAvoidanceScenario:
    def __init__(self, input_file, launcher=False, speedbump=False):
 
-      print launcher
       self.validate_input_file(input_file)
       self.load_initial_state(input_file, launcher, speedbump)
       self.agent_path = []
@@ -156,11 +155,11 @@ class ObsticleAvoidanceScenario:
          self.room.weight[self.obsticle1.location] = 1000
          self.room.weight[self.obsticle2.location] = 1000
          came_from = a_star_search(self.room, self.agent_fl, self.agent_sl)
-         print "Total number nodes visited in optimized implementation: %d" % (len(came_from))
+         print "\nTotal number nodes visited in optimized implementation: %d" % (len(came_from))
 
       else:
          came_from = breadth_first_search_modified(self.room, self.agent_fl)
-         print "Total number nodes visited in nieve implementation: %d" % (len(came_from))
+         print "\nTotal number nodes visited in nieve implementation: %d" % (len(came_from))
 
       # when collision detected check step in cardinal directions
       escape_sequence = [(1, 0), (-1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
@@ -195,16 +194,16 @@ class ObsticleAvoidanceScenario:
                pass
 
             else:
+               # if the next location and current location conflict, re-route to near by spot
                while(self.agent_location == self.obsticle1.location or self.agent_location == self.obsticle2.location):
                    gen = (detour for detour in escape_sequence if evading != True)
                    for detour in gen:
                         offset = tuple(map(lambda x, y: x + y, self.agent_location, detour))
                         if (not self.room.in_graph(offset)):
-                            print ", but %s not in room" % (offset,)
+                            pass
                         elif (offset == self.obsticle2.location or offset == self.obsticle1.location):
-                            print ", but %s would lead to collision" % (offset,)
+                            pass
                         else:
-                            print "Taking detour.. Moving to position %s" % (offset,)
                             came_from_temp[offset] = self.agent_location
                             self.agent_location = offset
                             evading = True
@@ -212,7 +211,6 @@ class ObsticleAvoidanceScenario:
          self.game_states.append([self.agent_location, self.obsticle1.location, self.obsticle2.location])
          self.print_graph_with_path()
 
-      #self.print_graph_with_path()
       if( self.agent_waits >= 6 ):
          print "Robot is unable to reach the finish"
          exit()
